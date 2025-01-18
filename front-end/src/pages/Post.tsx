@@ -3,8 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkle, WandSparkles } from "lucide-react";
+import { useState } from "react";
 
 const Post = () => {
+	const [name, setName] = useState("");
+	const [prompt, setPrompt] = useState("");
 	return (
 		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
 			<div className="flex flex-col gap-6 p-4 text-white w-1/2">
@@ -23,6 +26,8 @@ const Post = () => {
 							className="bg-homeBackground h-12"
 							type="text"
 							placeholder="Enter your name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
 						/>
 					</div>
 					<div>
@@ -30,6 +35,8 @@ const Post = () => {
 						<Textarea
 							className="bg-homeBackground h-40"
 							placeholder="Write your prompt here"
+							value={prompt}
+							onChange={(e) => setPrompt(e.target.value)}
 						/>
 					</div>
 					<span className="text-sm opacity-50">
