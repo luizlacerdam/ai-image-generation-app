@@ -12,13 +12,13 @@ const Post = () => {
 					<span className="text-2xl font-semibold">
 						Generate Image with prompt
 					</span>
-					<span>
+					<span className="text-normal opacity-50">
 						Write your prompt according to the image you want to generate!
 					</span>
 				</div>
 				<div className="flex flex-col gap-6">
 					<div>
-						<Label>AUTHOR</Label>
+						<Label className="opacity-50 text-sm">AUTHOR</Label>
 						<Input
 							className="bg-homeBackground h-12"
 							type="text"
@@ -26,13 +26,13 @@ const Post = () => {
 						/>
 					</div>
 					<div>
-						<Label>IMAGE PROMPT</Label>
+						<Label className="opacity-50 text-sm">IMAGE PROMPT</Label>
 						<Textarea
 							className="bg-homeBackground h-40"
 							placeholder="Write your prompt here"
 						/>
 					</div>
-					<span className="text-sm">
+					<span className="text-sm opacity-50">
 						* You can post the AI Generated image to showcase in the community!
 					</span>
 				</div>
@@ -51,7 +51,9 @@ const Post = () => {
 				</div>
 			</div>
 			<div className="w-1/2 border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
-				<span className="text-white">Write a prompt to generate image</span>
+				<span className="text-white text-opacity-50">
+					Write a prompt to generate image
+				</span>
 			</div>
 		</div>
 	);
