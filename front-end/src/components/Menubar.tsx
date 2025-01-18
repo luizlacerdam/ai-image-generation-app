@@ -16,7 +16,7 @@ const MenuBar = () => {
 	};
 
 	return (
-		<nav className="flex flex-row justify-between items-center bg-[#1e1f2a] text-white p-4 shadow-md">
+		<nav className="flex flex-row justify-between items-center bg-[#1e1f2a] text-white p-4 shadow-md px-8">
 			<div className="font-bold text-xl">luiz's GemAI</div>
 			<Button
 				onClick={handleNavigate}
