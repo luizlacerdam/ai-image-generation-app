@@ -20,7 +20,11 @@ const MenuBar = () => {
 			<div className="font-bold text-xl">luiz's GemAI</div>
 			<Button
 				onClick={handleNavigate}
-				className="bg-violet-500 hover:bg-violet-800"
+				className={
+					url.pathname === "/post"
+						? "bg-violet-500 hover:bg-violet-800"
+						: "bg-blue-500 hover:bg-blue-800"
+				}
 				type="button"
 			>
 				{url.pathname === "/post" ? <AppWindow /> : <Plus />}

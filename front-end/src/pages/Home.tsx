@@ -17,7 +17,7 @@ const Home = () => {
 				</div>
 			</div>
 			<Input
-				className="bg-homeBackground text-white mt-6 mx-auto w-1/2"
+				className="bg-homeBackground text-white mt-6 mx-auto w-1/2 h-12"
 				type="text"
 				placeholder="Search with prompt or name . . ."
 			/>
