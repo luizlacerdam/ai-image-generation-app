@@ -4,12 +4,9 @@ import MenuBar from "./Menubar";
 
 const Layout = () => {
 	return (
-		<div>
-			{/* Menu Bar */}
+		<div className="flex flex-col min-h-screen">
 			<MenuBar />
-
-			{/* Main Content */}
-			<main>
+			<main className="flex-grow bg-[#171821]">
 				<Outlet />
 			</main>
 		</div>

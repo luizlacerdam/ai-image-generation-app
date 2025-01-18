@@ -1,22 +1,11 @@
-import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
 
 const MenuBar = () => {
 	return (
-		<div>
-			<nav>
-				<ul>
-					<li>
-						<Link to="/">Home</Link>
-					</li>
-					<li>
-						<Link to="/about">About</Link>
-					</li>
-					<li>
-						<Link to="/contact">Contact</Link>
-					</li>
-				</ul>
-			</nav>
-		</div>
+		<nav className="flex flex-row justify-between items-center bg-[#1e1f2a] text-white p-4 shadow-md">
+			<div className="font-semibold">luiz's images gen</div>
+			<Button type="button">+ Create new post</Button>
+		</nav>
 	);
 };
 
