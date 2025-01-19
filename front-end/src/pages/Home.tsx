@@ -4,7 +4,7 @@ import { Brain } from "lucide-react";
 const Home = () => {
 	return (
 		<div className="bg-[#171821]">
-			<div className="flex flex-col mt-6 gap-2">
+			<div className="flex flex-col mt-12 gap-2">
 				<span className="text-white text-4xl font-normal text-center">
 					Explore popular posts in the Community
 				</span>

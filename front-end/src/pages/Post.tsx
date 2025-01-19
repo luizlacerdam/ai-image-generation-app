@@ -8,6 +8,9 @@ import { useState } from "react";
 const Post = () => {
 	const [name, setName] = useState("");
 	const [prompt, setPrompt] = useState("");
+
+	const handleGenerateImage = async () => {};
+
 	return (
 		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
 			<div className="flex flex-col gap-6 p-4 text-white w-1/2">
@@ -44,7 +47,11 @@ const Post = () => {
 					</span>
 				</div>
 				<div className="flex flex-row justify-center gap-4 w-full">
-					<Button className="bg-blue-500 hover:bg-blue-800 w-1/2" type="button">
+					<Button
+						className="bg-blue-500 hover:bg-blue-800 w-1/2"
+						type="button"
+						onClick={handleGenerateImage}
+					>
 						<Sparkle />
 						Generate Image
 					</Button>
