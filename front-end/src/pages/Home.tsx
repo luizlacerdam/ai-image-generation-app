@@ -127,7 +127,7 @@ const Home = () => {
 				type="text"
 				placeholder="Search with prompt or name . . ."
 			/>
-			<div className="bg-red-500 mt-10 max-w-7xl flex justify-center py-12 items-center mx-auto">
+			<div className="mt-10 max-w-7xl flex justify-center py-12 items-center mx-auto">
 				<div
 					className="grid gap-5"
 					style={{
