@@ -5,7 +5,6 @@ import { AppWindow, Plus } from "lucide-react";
 const MenuBar = () => {
 	const navigate = useNavigate();
 	const url = useLocation();
-	console.log(url);
 
 	const handleNavigate = () => {
 		if (url.pathname === "/post") {
