@@ -9,13 +9,11 @@ import { useState } from "react";
 const Post = () => {
 	const [name, setName] = useState("");
 	const [prompt, setPrompt] = useState("");
-	const { generateNewImage } = useImageGen();
-	const [imageUrl, setImageUrl] = useState("");
+	const { generateNewImage, } = useImageGen();
+	const [imageUrl, setImageUrl] = useState('');
 	const handleGenerateImage = async () => {
 		generateNewImage.mutate(prompt, {
 			onSuccess: (data) => {
-				console.log("Image generated:", data);
-
 				setImageUrl(data); // Update the image URL state with the generated image URL
 			},
 			onError: (error) => {
@@ -23,6 +21,11 @@ const Post = () => {
 			},
 		});
 	};
+
+	const postImageDisabled = !imageUrl || generateNewImage.isPending || !name;
+	const handlePostImage = () => {
+		// Implement the logic to post the image to the community
+	}
 
 	return (
 		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
@@ -64,6 +67,7 @@ const Post = () => {
 						className="bg-blue-500 hover:bg-blue-800 w-1/2"
 						type="button"
 						onClick={handleGenerateImage}
+						disabled={!prompt || generateNewImage.isPending}
 					>
 						<Sparkle />
 						Generate Image
@@ -71,6 +75,8 @@ const Post = () => {
 					<Button
 						className="bg-violet-500 hover:bg-violet-800 w-1/2"
 						type="button"
+						disabled={postImageDisabled}
+						onClick={handlePostImage}
 					>
 						<WandSparkles />
 						Post Image
