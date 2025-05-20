@@ -2,14 +2,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import useImageGen from "@/hooks/api/useImageGen";
 import { Sparkle, WandSparkles } from "lucide-react";
 import { useState } from "react";
 
 const Post = () => {
 	const [name, setName] = useState("");
 	const [prompt, setPrompt] = useState("");
+	const { generateNewImage } = useImageGen();
+	const [imageUrl, setImageUrl] = useState("");
+	const handleGenerateImage = async () => {
+		generateNewImage.mutate(prompt, {
+			onSuccess: (data) => {
+				console.log("Image generated:", data);
 
-	const handleGenerateImage = async () => {};
+				setImageUrl(data); // Update the image URL state with the generated image URL
+			},
+			onError: (error) => {
+				console.error("Error generating image:", error);
+			},
+		});
+	};
 
 	return (
 		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
@@ -65,9 +78,17 @@ const Post = () => {
 				</div>
 			</div>
 			<div className="w-1/2 border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
-				<span className="text-white text-opacity-50">
-					Write a prompt to generate image
-				</span>
+				{imageUrl ? (
+					<img
+						src={imageUrl}
+						alt="Generated"
+						className="rounded-xl max-w-full max-h-full"
+					/>
+				) : (
+					<span className="text-white text-opacity-50">
+						Write a prompt to generate image
+					</span>
+				)}
 			</div>
 		</div>
 	);

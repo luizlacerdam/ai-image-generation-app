@@ -1,6 +1,6 @@
 import ImageCard from "@/components/ImageCard";
 import { Input } from "@/components/ui/input";
-import { Brain } from "lucide-react";
+import { Brain, Search } from "lucide-react";
 
 const Home = () => {
 	const items = [
@@ -122,11 +122,14 @@ const Home = () => {
 					<Brain size={24} className="text-violet-500" />
 				</div>
 			</div>
+			<div className="flex flex-row justify-center items-center mt-10 gap-2 border-2 border-white rounded-xl py-2 px-4 mx-auto w-1/2">
+			<Search color="white"/>
 			<Input
-				className="bg-homeBackground text-white mt-6 mx-auto w-1/2 h-12"
+				className="focus-visible:ring-offset-0 focus-visible:ring-0 border-none focus-visible:border-0 bg-transparent text-white placeholder:text-white"
 				type="text"
 				placeholder="Search with prompt or name . . ."
-			/>
+				/>
+			</div>
 			<div className="mt-10 max-w-7xl flex justify-center py-12 items-center mx-auto">
 				<div
 					className="grid gap-5"
