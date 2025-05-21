@@ -1,85 +1,10 @@
 import ImageCard from "@/components/ImageCard";
 import { Input } from "@/components/ui/input";
+import usePost, { Post } from "@/hooks/api/usePost";
 import { Brain, Search } from "lucide-react";
 
 const Home = () => {
-	const items = [
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A beautiful sunset",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A serene mountain view",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A peaceful beach scene",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A vibrant cityscape",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A tranquil forest trail",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A beautiful sunset",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A serene mountain view",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A peaceful beach scene",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A vibrant cityscape",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A tranquil forest trail",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A starry night",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A snowy mountain peak",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A desert landscape",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A lush green valley",
-		},
-		{
-			photo: "https://picsum.photos/600",
-			author: "luiz",
-			prompt: "A roaring waterfall",
-		},
-	];
+	const { posts, isLoading } = usePost();
 
 	const calculateGridPosition = (index: number) => {
 		const group = Math.floor(index / 5);
@@ -140,13 +65,19 @@ const Home = () => {
 						gap: "20px",
 					}}
 				>
-					{items.map((item, index) => (
+					{isLoading ? (
+						<div className="flex justify-center items-center w-full h-full">
+							<span className="text-white text-2xl font-normal">
+								Loading...
+							</span>
+						</div>
+					) : (posts ?? []).map((item: Post, index: number) => (
 						<ImageCard
 							key={index}
 							item={item}
 							style={calculateGridPosition(index)}
 						/>
-					))}
+					)) }
 				</div>
 			</div>
 		</div>

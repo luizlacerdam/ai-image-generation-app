@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useImageGen from "@/hooks/api/useImageGen";
-import useSavePost from "@/hooks/api/useSavePost";
+import useSavePost from "@/hooks/api/usePost";
 import { Loader, Sparkle, WandSparkles } from "lucide-react";
 import { useState } from "react";
 const { VITE_AI_API_URL } = import.meta.env;
