@@ -7,9 +7,11 @@ export interface Post {
 	photo: string;
 }
 
-const getPosts = async (): Promise<Post[]> => {
-  const response = await api.get("/posts/all");
-  return response.data;
+const getPosts = async (search?: string): Promise<Post[]> => {
+	const response = await api.get("/posts/all", {
+		params: { search },
+	});
+	return response.data;
 };
 
 const savePost = async (data: Post): Promise<Post> => {
@@ -17,20 +19,20 @@ const savePost = async (data: Post): Promise<Post> => {
   return response.data;
 };
 
-export default function usePost() {
-  const queryClient = useQueryClient();
+export default function usePost(search: string) {
+	const queryClient = useQueryClient();
 
-  const postsQuery = useQuery<Post[]>({
-    queryKey: ["posts"],
-    queryFn: getPosts,
-  });
+	const postsQuery = useQuery<Post[]>({
+		queryKey: ["posts", search],
+		queryFn: () => getPosts(search),
+	});
 
-  const savePostMutation = useMutation({
-    mutationFn: savePost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-    },
-  });
+	const savePostMutation = useMutation({
+		mutationFn: savePost,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+		},
+	});
   
 	return {
 		...postsQuery,

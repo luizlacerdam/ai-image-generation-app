@@ -2,9 +2,14 @@ import ImageCard from "@/components/ImageCard";
 import { Input } from "@/components/ui/input";
 import usePost, { Post } from "@/hooks/api/usePost";
 import { Brain, Search } from "lucide-react";
+import { useDebounce } from "use-debounce"; // or 'bouncer' if you're using it
+
+import { useState } from "react";
 
 const Home = () => {
-	const { posts, isLoading } = usePost();
+		const [searchInput, setSearchInput] = useState("");
+			const [debouncedSearch] = useDebounce(searchInput, 500);
+	const { posts, isLoading } = usePost(debouncedSearch);
 
 	const calculateGridPosition = (index: number) => {
 		const group = Math.floor(index / 5);
@@ -48,12 +53,15 @@ const Home = () => {
 				</div>
 			</div>
 			<div className="flex flex-row justify-center items-center mt-10 gap-2 border-2 border-white rounded-xl py-2 px-4 mx-auto w-1/2">
-			<Search color="white"/>
+			<Search 
+			color="white"/>
 			<Input
+				value={searchInput}
+				onChange={(e) => setSearchInput(e.target.value)}
 				className="focus-visible:ring-offset-0 focus-visible:ring-0 border-none focus-visible:border-0 bg-transparent text-white placeholder:text-white"
 				type="text"
 				placeholder="Search with prompt or name . . ."
-				/>
+			/>
 			</div>
 			<div className="mt-10 max-w-7xl flex justify-center py-12 items-center mx-auto">
 				<div
