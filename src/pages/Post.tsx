@@ -3,18 +3,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useImageGen from "@/hooks/api/useImageGen";
-import { Sparkle, WandSparkles } from "lucide-react";
+import useSavePost from "@/hooks/api/useSavePost";
+import { Loader, Sparkle, WandSparkles } from "lucide-react";
 import { useState } from "react";
+const { VITE_AI_API_URL } = import.meta.env;
+
 
 const Post = () => {
 	const [name, setName] = useState("");
 	const [prompt, setPrompt] = useState("");
 	const { generateNewImage, } = useImageGen();
+	const { savePost } = useSavePost();
+
 	const [imageUrl, setImageUrl] = useState('');
 	const handleGenerateImage = async () => {
 		generateNewImage.mutate(prompt, {
 			onSuccess: (data) => {
 				setImageUrl(data); // Update the image URL state with the generated image URL
+				console.log("Image generated successfully:", data);
+				
 			},
 			onError: (error) => {
 				console.error("Error generating image:", error);
@@ -22,10 +29,30 @@ const Post = () => {
 		});
 	};
 
-	const postImageDisabled = !imageUrl || generateNewImage.isPending || !name;
-	const handlePostImage = () => {
-		// Implement the logic to post the image to the community
+	const postImageDisabled = !imageUrl || generateNewImage.isPending || !name || savePost.isPending;
+
+const handleSavePost = () => {
+	if (!imageUrl || !name || !prompt) {
+		alert("All fields are required!");
+		return;
 	}
+
+	savePost.mutate(
+		{
+			name,
+			prompt,
+			photo: `${VITE_AI_API_URL}/prompt/${prompt}`, // Use image URL created from blob
+		},
+		{
+			onSuccess: () => {
+				alert("Post saved successfully!");
+			},
+			onError: (error) => {
+				console.error("Failed to save post:", error);
+			},
+		}
+	);
+};
 
 	return (
 		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
@@ -76,7 +103,7 @@ const Post = () => {
 						className="bg-violet-500 hover:bg-violet-800 w-1/2"
 						type="button"
 						disabled={postImageDisabled}
-						onClick={handlePostImage}
+						onClick={handleSavePost}
 					>
 						<WandSparkles />
 						Post Image
@@ -84,7 +111,12 @@ const Post = () => {
 				</div>
 			</div>
 			<div className="w-1/2 border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
-				{imageUrl ? (
+				{generateNewImage.isPending ? (
+					<span className="text-white text-opacity-50 animate-pulse flex items-center flex-col">
+						<Loader className="animate-spin mr-2" />
+						Generating image...
+					</span>
+				) : imageUrl ? (
 					<img
 						src={imageUrl}
 						alt="Generated"

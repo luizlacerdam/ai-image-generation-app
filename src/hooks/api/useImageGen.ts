@@ -1,8 +1,8 @@
+import aiApi from "@/api/aiApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../../api/api";
 
 const generateImage = async (prompt: string): Promise<string> => {
-	const response = await api.post("/generate", { prompt }, {
+	const response = await aiApi.get(`/prompt/${prompt}`, {
 		responseType: 'arraybuffer', // ensure binary response
 	});
 	const blob = new Blob([response.data], { type: "image/jpeg" });
