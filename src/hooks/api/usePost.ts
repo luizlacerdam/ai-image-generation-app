@@ -15,16 +15,17 @@ const getPosts = async (search?: string): Promise<Post[]> => {
 };
 
 const savePost = async (data: Post): Promise<Post> => {
-  const response = await api.post("/posts/new", data);
-  return response.data;
+	const response = await api.post("/posts/new", data);
+	return response.data;
 };
 
-export default function usePost(search: string) {
+export default function usePost(search?: string) {
 	const queryClient = useQueryClient();
 
 	const postsQuery = useQuery<Post[]>({
-		queryKey: ["posts", search],
+		queryKey: ["posts", search ?? ""],
 		queryFn: () => getPosts(search),
+		enabled: search !== undefined,
 	});
 
 	const savePostMutation = useMutation({
@@ -33,7 +34,7 @@ export default function usePost(search: string) {
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});
-  
+
 	return {
 		...postsQuery,
 		posts: postsQuery.data,

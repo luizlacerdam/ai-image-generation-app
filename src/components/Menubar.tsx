@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { AppWindow, Plus } from "lucide-react";
 
@@ -16,7 +16,7 @@ const MenuBar = () => {
 
 	return (
 		<nav className="flex flex-row justify-between items-center bg-[#1e1f2a] text-white p-4 shadow-md px-8 sticky top-0 z-10">
-			<div className="font-bold text-xl">luiz's GemAI</div>
+			<Link to={'/'} className="font-bold text-xl">luiz's GemAI</Link>
 			<Button
 				onClick={handleNavigate}
 				className={

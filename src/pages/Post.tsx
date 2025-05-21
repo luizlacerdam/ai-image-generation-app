@@ -6,6 +6,7 @@ import useImageGen from "@/hooks/api/useImageGen";
 import useSavePost from "@/hooks/api/usePost";
 import { Loader, Sparkle, WandSparkles } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 const { VITE_AI_API_URL } = import.meta.env;
 
 
@@ -19,9 +20,7 @@ const Post = () => {
 	const handleGenerateImage = async () => {
 		generateNewImage.mutate(prompt, {
 			onSuccess: (data) => {
-				setImageUrl(data); // Update the image URL state with the generated image URL
-				console.log("Image generated successfully:", data);
-				
+				setImageUrl(data); // Update the image URL state with the generated image URL				
 			},
 			onError: (error) => {
 				console.error("Error generating image:", error);
@@ -45,9 +44,10 @@ const handleSavePost = () => {
 		},
 		{
 			onSuccess: () => {
-				alert("Post saved successfully!");
+				toast.success("Post saved successfully!");
 			},
 			onError: (error) => {
+				toast.error("Failed to save post. Please try again.");
 				console.error("Failed to save post:", error);
 			},
 		}

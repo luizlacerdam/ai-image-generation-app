@@ -30,7 +30,8 @@ const Home = () => {
 		const column =
 			group % 2 === 0
 				? ((positionInGroup - 1) % 2) + 3
-				: ((positionInGroup - 1) % 2) + 1;
+				: 2 - ((positionInGroup - 1) % 2)
+
 		const row = Math.floor((positionInGroup - 1) / 2) + group * 2 + 1;
 		return {
 			gridColumn: `${column} / ${column + 1}`,

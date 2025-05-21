@@ -1,6 +1,7 @@
 // Layout.tsx
 import { Outlet } from "react-router-dom";
 import MenuBar from "./Menubar";
+import { ToastContainer } from 'react-toastify';
 
 const Layout = () => {
 	return (
@@ -8,6 +9,8 @@ const Layout = () => {
 			<MenuBar />
 			<main className="flex-grow bg-[#171821]">
 				<Outlet />
+				<ToastContainer
+				/>
 			</main>
 		</div>
 	);
