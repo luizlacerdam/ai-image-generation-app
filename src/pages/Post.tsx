@@ -55,8 +55,8 @@ const handleSavePost = () => {
 };
 
 	return (
-		<div className="flex flex-row mt-20 p-12 gap-20 px-12 max-w-7xl mx-auto">
-			<div className="flex flex-col gap-6 p-4 text-white w-1/2">
+		<div className="flex flex-col-reverse sm:flex-row sm:mt-20 p-12 sm:gap-20 gap-10 px-6 max-w-7xl mx-auto">
+			<div className="flex flex-col gap-6 p-4 text-white sm:w-1/2 w-full">
 				<div className="flex flex-col gap-2">
 					<span className="text-2xl font-semibold">
 						Generate Image with prompt
@@ -110,7 +110,7 @@ const handleSavePost = () => {
 					</Button>
 				</div>
 			</div>
-			<div className="w-1/2 border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
+				<div className="sm:w-1/2 w-full aspect-square bg-[#1e1f2a] border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
 				{generateNewImage.isPending ? (
 					<span className="text-white text-opacity-50 animate-pulse flex items-center flex-col">
 						<Loader className="animate-spin mr-2" />

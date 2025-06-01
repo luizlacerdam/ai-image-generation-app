@@ -48,7 +48,7 @@ const Home = () => {
 				</div>
 			</div>
 
-			<div className="flex flex-row justify-center items-center mt-10 gap-2 border-2 border-white rounded-xl py-2 px-4 mx-auto w-1/2">
+			<div className="flex flex-row justify-center items-center mt-10 gap-2 border-2 border-white rounded-xl py-2 px-4 mx-auto sm:w-1/2 w-[85%]">
 				<Search color="white" />
 				<Input
 					value={searchInput}
@@ -59,7 +59,7 @@ const Home = () => {
 				/>
 			</div>
 
-			<div className="mt-10 max-w-7xl flex justify-center py-12 items-center mx-auto">
+			<div className="p-4 mt-10 sm:max-w-7xl flex justify-center py-12 items-center mx-auto">
 				{isLoading ? (
 					<div className="flex justify-center items-center w-full h-full">
 						<span className="text-white text-opacity-50 animate-pulse flex items-center flex-col">
@@ -69,12 +69,11 @@ const Home = () => {
 					</div>
 				) : (
 					<div
-						className="grid gap-5"
+						className="grid sm:gap-6 gap-3"
 						style={{
 							display: "grid",
 							gridTemplateColumns: "repeat(4, 1fr)",
 							gridTemplateRows: "repeat(auto-fill, 1fr)",
-							gap: "20px",
 						}}
 					>
 						{(posts ?? []).map((item: Post, index: number) => (
