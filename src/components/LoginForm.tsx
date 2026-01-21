@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import useAuth from "@/hooks/api/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email."),
@@ -32,7 +32,10 @@ const formSchema = z.object({
 
 export default function SignInForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { login } = useAuth();
+  const from = location.state?.from?.pathname || "/";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,7 +50,7 @@ export default function SignInForm() {
     try {
       await login.mutateAsync(values);
       toast.success("Signed in successfully!");
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Invalid email or password.");
     }
