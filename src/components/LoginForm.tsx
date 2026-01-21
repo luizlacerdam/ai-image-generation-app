@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
+import useAuth from "@/hooks/api/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email."),
@@ -29,6 +31,9 @@ const formSchema = z.object({
 });
 
 export default function SignInForm() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,10 +43,15 @@ export default function SignInForm() {
     mode: "onSubmit",
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast.success("Signed in successfully!");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await login.mutateAsync(values);
+      toast.success("Signed in successfully!");
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Invalid email or password.");
+    }
   }
-
   return (
     <Card className="mx-auto flex w-full flex-col justify-center sm:w-[350px]">
       <CardHeader className="flex flex-col text-center">
@@ -104,8 +114,13 @@ export default function SignInForm() {
 
       <CardFooter>
         <Field orientation="horizontal">
-          <Button className="w-full" type="submit" form="form-signin">
-            Sign In
+          <Button
+            disabled={login.isPending}
+            className="w-full"
+            type="submit"
+            form="form-signin"
+          >
+            {login.isPending ? "Signing in..." : "Sign In"}
           </Button>
         </Field>
       </CardFooter>

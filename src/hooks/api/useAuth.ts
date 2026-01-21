@@ -1,4 +1,4 @@
-import aiApi from "@/api/aiApi";
+import api from "@/api/api";
 import { useMutation } from "@tanstack/react-query";
 import { setTokenCookie } from "@/utils/authCookies";
 
@@ -17,14 +17,14 @@ export default function useAuth() {
   // API calls (inside the hook)
   // -----------------------------
   const loginRequest = async (payload: AuthPayload): Promise<AuthResponse> => {
-    const { data } = await aiApi.post<AuthResponse>("/auth/login", payload);
+    const { data } = await api.post<AuthResponse>("/auth/login", payload);
     return data;
   };
 
   const registerRequest = async (
     payload: AuthPayload,
   ): Promise<AuthResponse> => {
-    const { data } = await aiApi.post<AuthResponse>("/auth/register", payload);
+    const { data } = await api.post<AuthResponse>("/auth/register", payload);
     return data;
   };
 
@@ -45,7 +45,6 @@ export default function useAuth() {
     mutationKey: ["auth", "register"],
     mutationFn: registerRequest,
     onSuccess: async (_data, variables) => {
-      // auto-login after successful register
       await login.mutateAsync(variables);
     },
   });

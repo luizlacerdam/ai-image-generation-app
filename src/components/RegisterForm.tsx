@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
+import useAuth from "@/hooks/api/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email."),
@@ -30,6 +31,9 @@ const formSchema = z.object({
 });
 
 export default function SignUpForm() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,8 +43,14 @@ export default function SignUpForm() {
     mode: "onSubmit",
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast.success("Account created successfully!");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await register.mutateAsync(values);
+      toast.success("Account created! You are now logged in.");
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Could not create account.");
+    }
   }
 
   return (
@@ -105,8 +115,13 @@ export default function SignUpForm() {
 
       <CardFooter>
         <Field orientation="horizontal">
-          <Button className="w-full" type="submit" form="form-signup">
-            Create account
+          <Button
+            disabled={register.isPending}
+            className="w-full"
+            type="submit"
+            form="form-signup"
+          >
+            {register.isPending ? "Creating account..." : "Sign Up"}
           </Button>
         </Field>
       </CardFooter>
