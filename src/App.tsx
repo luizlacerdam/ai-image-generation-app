@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import SignInForm from "./components/LoginForm";
 import SignUpForm from "./components/RegisterForm";
 import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -18,8 +19,10 @@ function App() {
             <Route path="register" element={<SignUpForm />} />
           </Route>
           <Route path="/" element={<Layout />}>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/post" element={<Post />} />
+            </Route>
             <Route index element={<Home />} />
-            <Route path="/post" element={<Post />} />
           </Route>
         </Routes>
       </BrowserRouter>
