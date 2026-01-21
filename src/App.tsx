@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Layout from "./components/Layout";
 import Post from "./pages/Post";
 import SignUp from "./pages/SignUp";
+import { ToastContainer } from "react-toastify";
+
 function App() {
   return (
     <>
@@ -16,6 +18,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </>
   );
 }

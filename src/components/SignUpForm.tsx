@@ -40,23 +40,12 @@ export default function SignUpForm() {
   });
 
   function onSubmit(data: z.infer<typeof formSchema>) {
-    toast.success(
-      <div className="flex flex-col gap-2">
-        <strong>Account details ready to send</strong>
-        <pre className="bg-muted text-muted-foreground rounded-md p-2 text-xs">
-          {JSON.stringify({ email: data.email }, null, 2)}
-        </pre>
-      </div>,
-      {
-        position: "bottom-right",
-        autoClose: 3000,
-      },
-    );
+    toast.success("Account created successfully!");
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
-      <CardHeader>
+    <Card className="mx-auto flex w-full flex-col justify-center sm:w-[350px]">
+      <CardHeader className="flex flex-col text-center">
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
           Enter your email and password to create your account.
@@ -80,9 +69,6 @@ export default function SignUpForm() {
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
                   />
-                  <FieldDescription>
-                    We’ll use this email to sign you in.
-                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -106,9 +92,7 @@ export default function SignUpForm() {
                     autoComplete="new-password"
                     aria-invalid={fieldState.invalid}
                   />
-                  <FieldDescription>
-                    Must be at least 6 characters.
-                  </FieldDescription>
+
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -121,10 +105,7 @@ export default function SignUpForm() {
 
       <CardFooter>
         <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          <Button type="submit" form="form-signup">
+          <Button className="w-full" type="submit" form="form-signup">
             Create account
           </Button>
         </Field>

@@ -1,28 +1,37 @@
 import SignUpForm from "@/components/SignUpForm";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   return (
-    <div className="container-wrapper section-soft flex flex-1 flex-col pb-6">
-      <div className="theme-container container flex flex-1 scroll-mt-20 flex-col">
-        <div className="bg-background flex flex-col overflow-hidden rounded-lg border bg-clip-padding md:flex-1 xl:rounded-xl">
-          <div className="relative container hidden flex-1 shrink-0 items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="text-primary relative hidden h-full flex-col p-10 lg:flex dark:border-r">
-              <div className="bg-primary/5 absolute inset-0">
-                <div className="relative z-20 flex items-center text-lg font-medium">
-                  luiz's AIGenerator
-                </div>
-                <div className="relative z-20 mt-auto">
-                  <blockquote className="leading-normal text-balance">
-                    "Creativity is intelligence having fun." <br />- Albert
-                    Einstein
-                  </blockquote>
-                </div>
+    <div className="min-h-screen w-full flex flex-col">
+      <div className="flex flex-1 flex-col">
+        <div className="bg-background flex flex-1 overflow-hidden md:flex-1">
+          <div className="relative grid flex-1 lg:max-w-none lg:grid-cols-2 lg:px-0">
+            <Button
+              onClick={() => navigate("/login")}
+              className="absolute top-4 right-4 md:top-8 md:right-8"
+            >
+              Login
+            </Button>
+            {/* Left panel */}
+            <div className="text-primary relative hidden h-full flex-col p-10 lg:flex">
+              <div className="bg-primary/5 pointer-events-none absolute inset-0" />
+              <div className="relative z-20 flex items-center text-lg font-medium">
+                luiz&apos;s AIGenerator
+              </div>
+              <div className="relative z-20 mt-auto">
+                <blockquote className="leading-normal text-balance">
+                  "Simplicity is the ultimate sophistication" <br />- Da Vinci
+                </blockquote>
               </div>
             </div>
-            <div className="flex items-center justify-center lg:h-[1000px] lg:p-8">
-              <div className="mx-auto flex w-full flex-col justify-center gap-6 sm:w-[350px]">
+
+            {/* Form panel */}
+            <div className="flex items-center justify-center p-6 lg:p-8">
+              <div className="w-full max-w-sm">
                 <SignUpForm />
-                <div className="grid gap-6"></div>
               </div>
             </div>
           </div>
