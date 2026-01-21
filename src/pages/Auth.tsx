@@ -1,19 +1,25 @@
-import SignUpForm from "@/components/SignUpForm";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-
-const SignUp = () => {
+const Auth = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isLogin = pathname.includes("login");
+
   return (
     <div className="min-h-screen w-full flex flex-col">
       <div className="flex flex-1 flex-col">
         <div className="bg-background flex flex-1 overflow-hidden md:flex-1">
           <div className="relative grid flex-1 lg:max-w-none lg:grid-cols-2 lg:px-0">
+            {/* Toggle button */}
+
             <Button
-              onClick={() => navigate("/login")}
+              onClick={() =>
+                navigate(isLogin ? "/auth/register" : "/auth/login")
+              }
               className="absolute top-4 right-4 md:top-8 md:right-8"
             >
-              Login
+              {isLogin ? "Create account" : "Login"}
             </Button>
             {/* Left panel */}
             <div className="text-primary relative hidden h-full flex-col p-10 lg:flex">
@@ -31,7 +37,7 @@ const SignUp = () => {
             {/* Form panel */}
             <div className="flex items-center justify-center p-6 lg:p-8">
               <div className="w-full max-w-sm">
-                <SignUpForm />
+                <Outlet />
               </div>
             </div>
           </div>
@@ -41,4 +47,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Auth;
