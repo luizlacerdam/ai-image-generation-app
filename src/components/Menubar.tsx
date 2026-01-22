@@ -32,11 +32,11 @@ const MenuBar = () => {
 
   const handleLogout = () => {
     clearToken();
-    navigate("/auth/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
-    <nav className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/20">
+    <nav className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-secondary/20">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 p-4">
         {/* Left */}
         <div className="flex items-center gap-4">

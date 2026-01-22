@@ -78,7 +78,7 @@ const Home = () => {
   }
 
   return (
-    <div className="bg-background">
+    <div className="flex-1 bg-background">
       {/* Header */}
       <div className="flex flex-col mt-12 gap-2 px-6">
         <span className="text-4xl font-normal text-center text-foreground">
