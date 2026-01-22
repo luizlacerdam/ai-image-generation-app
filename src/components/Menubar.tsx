@@ -9,14 +9,18 @@ import {
   LogIn,
   UserPlus,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { clearToken, isAuthenticated } from "@/utils/auth";
+import useTheme from "@/hooks/useTheme";
 
 const MenuBar = () => {
   const navigate = useNavigate();
   const url = useLocation();
-
   const authed = isAuthenticated();
+
+  const { theme, toggleTheme } = useTheme();
 
   const handleMainAction = () => {
     if (!authed) {
@@ -32,88 +36,96 @@ const MenuBar = () => {
   };
 
   return (
-    <nav className="flex items-baseline justify-between bg-[#1e1f2a] text-white p-4 shadow-md sticky top-0 z-10">
-      <div className="flex items-center gap-4 w-full md:w-auto mb-4 md:mb-0">
-        <Link
-          to="/"
-          className="font-bold text-lg sm:text-xl text-white hover:text-violet-400 transition"
-        >
-          luiz&apos;s AIGenerator
-        </Link>
+    <nav className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/20">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 p-4">
+        {/* Left */}
+        <div className="flex items-center gap-4">
+          <Link
+            to="/"
+            className="font-bold text-lg sm:text-xl text-foreground hover:text-primary transition"
+          >
+            luiz&apos;s AIGenerator
+          </Link>
 
-        <div className="flex gap-3">
-          <a
-            href="https://github.com/luizlacerdam"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-violet-400 transition"
-          >
-            <Github className="w-5 h-5" />
-          </a>
-          <a
-            href="https://www.linkedin.com/in/luizlacerdam/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-violet-400 transition"
-          >
-            <Linkedin className="w-5 h-5" />
-          </a>
-          <a
-            href="https://www.luizlacerdam.dev/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-violet-400 transition"
-          >
-            <Globe className="w-5 h-5" />
-          </a>
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <a
+              href="https://github.com/luizlacerdam"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="GitHub"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/luizlacerdam/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.luizlacerdam.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="Website"
+            >
+              <Globe className="h-5 w-5" />
+            </a>
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 w-36 md:w-auto">
-        {/* Main action */}
-        <Button
-          onClick={handleMainAction}
-          className={`w-full md:w-auto ${
-            authed
-              ? url.pathname === "/post"
-                ? "bg-violet-500 hover:bg-violet-800"
-                : "bg-blue-500 hover:bg-blue-800"
-              : "bg-blue-500 hover:bg-blue-800"
-          }`}
-          type="button"
-        >
+        {/* Right */}
+        <div className="flex items-center gap-2">
+          {/* Theme toggle */}
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="border-border"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            title="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </Button>
+
+          {/* Main action */}
+          <Button onClick={handleMainAction} type="button">
+            {!authed ? (
+              <LogIn className="mr-2" />
+            ) : url.pathname === "/post" ? (
+              <AppWindow className="mr-2" />
+            ) : (
+              <Plus className="mr-2" />
+            )}
+            {!authed ? "Login" : url.pathname === "/post" ? "Home" : "New post"}
+          </Button>
+
+          {/* Secondary */}
           {!authed ? (
-            <LogIn className="mr-2" />
-          ) : url.pathname === "/post" ? (
-            <AppWindow className="mr-2" />
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => navigate("/auth/register")}
+            >
+              <UserPlus className="mr-2" />
+              Sign up
+            </Button>
           ) : (
-            <Plus className="mr-2" />
+            <Button variant="outline" type="button" onClick={handleLogout}>
+              <LogOut className="mr-2" />
+              Logout
+            </Button>
           )}
-          {!authed ? "Login" : url.pathname === "/post" ? "Home" : "New post"}
-        </Button>
-
-        {/* Secondary actions */}
-        {!authed ? (
-          <Button
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-            type="button"
-            onClick={() => navigate("/auth/register")}
-          >
-            <UserPlus className="mr-2" />
-            Sign up
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
-            type="button"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2" />
-            Logout
-          </Button>
-        )}
+        </div>
       </div>
     </nav>
   );

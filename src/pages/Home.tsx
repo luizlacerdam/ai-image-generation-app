@@ -4,10 +4,12 @@ import { Brain, Loader, Search } from "lucide-react";
 import ImageCard from "@/components/ImageCard";
 import { Input } from "@/components/ui/input";
 import usePost, { PostResponse } from "@/hooks/api/usePost";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useUserPosts from "@/hooks/api/useUserPosts";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
+  const navigate = useNavigate();
   const { username } = useParams<{ username?: string }>();
   const hasUsername = !!username?.trim();
 
@@ -57,30 +59,34 @@ const Home = () => {
 
   if (isUserNotFound) {
     return (
-      <div className="bg-[#171821] min-h-screen flex flex-col justify-center items-center text-white">
-        <h1 className="text-5xl font-bold mb-4">404</h1>
-        <p className="text-xl opacity-70 mb-6">
-          User <span className="font-semibold">@{username}</span> not found
+      <div className="min-h-[calc(100vh-64px)] flex flex-col justify-center items-center px-6">
+        <h1 className="text-5xl font-bold">404</h1>
+        <p className="mt-4 text-xl text-muted-foreground text-center">
+          User{" "}
+          <span className="font-semibold text-foreground">@{username}</span> not
+          found
         </p>
-        <p className="opacity-50 mb-8">
+        <p className="mt-2 text-muted-foreground text-center">
           The user you are looking for does not exist or was removed.
         </p>
-        <button
-          onClick={() => (window.location.href = "/")}
-          className="px-6 py-3 bg-violet-600 hover:bg-violet-700 rounded-lg"
-        >
+
+        <Button className="mt-8" onClick={() => navigate("/")}>
           Go back home
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#171821]">
-      <div className="flex flex-col mt-12 gap-2">
-        <span className="text-white text-4xl font-normal text-center">
-          Explore popular posts in the Community
+    <div className="bg-background">
+      {/* Header */}
+      <div className="flex flex-col mt-12 gap-2 px-6">
+        <span className="text-4xl font-normal text-center text-foreground">
+          {hasUsername
+            ? `Posts by @${username}`
+            : "Explore popular posts in the Community"}
         </span>
+
         <div className="flex flex-row justify-center items-center gap-2 text-primary">
           <Brain size={24} />
           <span className="font-bold text-2xl text-center">
@@ -90,21 +96,27 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="flex flex-row justify-center items-center mt-10 gap-2 border-2 border-white rounded-xl py-2 px-4 mx-auto sm:w-1/2 w-[85%]">
-        <Search color="white" />
-        <Input
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="focus-visible:ring-offset-0 focus-visible:ring-0 border-none focus-visible:border-0 bg-transparent text-white placeholder:text-white"
-          type="text"
-          placeholder="Search with prompt or name . . ."
-        />
-      </div>
+      {/* Search only on community feed */}
+      {!hasUsername && (
+        <div className="mt-10 mx-auto sm:w-1/2 w-[85%] px-6 sm:px-0">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2">
+            <Search className="text-muted-foreground" />
+            <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="border-none bg-transparent text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+              type="text"
+              placeholder="Search by prompt..."
+            />
+          </div>
+        </div>
+      )}
 
+      {/* Content */}
       <div className="p-4 mt-10 sm:max-w-7xl flex justify-center py-12 items-center mx-auto">
         {isLoading ? (
           <div className="flex justify-center items-center w-full h-full">
-            <span className="text-white text-opacity-50 animate-pulse flex items-center flex-col">
+            <span className="text-muted-foreground animate-pulse flex items-center flex-col">
               <Loader className="animate-spin mr-2" />
               Loading posts...
             </span>
@@ -120,7 +132,7 @@ const Home = () => {
           >
             {(posts ?? []).map((item: PostResponse, index: number) => (
               <ImageCard
-                key={index}
+                key={item._id}
                 item={item}
                 style={calculateGridPosition(index)}
               />
