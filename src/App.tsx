@@ -23,6 +23,7 @@ function App() {
               <Route path="/post" element={<Post />} />
             </Route>
             <Route index element={<Home />} />
+            <Route path=":username" element={<Home />} />
           </Route>
         </Routes>
       </BrowserRouter>

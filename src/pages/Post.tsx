@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useImageGen from "@/hooks/api/useImageGen";
@@ -17,7 +16,6 @@ const blobToBase64 = (blob: Blob): Promise<string> =>
   });
 
 const Post = () => {
-  // const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
   const { generateNewImage } = useImageGen();
   const { savePost } = useSavePost();

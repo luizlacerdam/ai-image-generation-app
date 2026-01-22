@@ -31,13 +31,13 @@ const savePost = async (data: PostCreate): Promise<PostResponse> => {
   return response.data;
 };
 
-export default function usePost(search?: string) {
+export default function usePost(search?: string, enabled = true) {
   const queryClient = useQueryClient();
 
   const postsQuery = useQuery<PostResponse[]>({
     queryKey: ["posts", search ?? ""],
     queryFn: () => getPosts(search),
-    enabled: search !== undefined,
+    enabled,
   });
 
   const savePostMutation = useMutation({
