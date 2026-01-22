@@ -6,3 +6,7 @@ export const getAuthToken = (): string | null => {
 export const isAuthenticated = (): boolean => {
   return !!getAuthToken();
 };
+
+export const clearToken = () => {
+  document.cookie = "token=; Max-Age=0; path=/; SameSite=Lax";
+};
