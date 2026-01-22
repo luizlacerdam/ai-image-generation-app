@@ -11,24 +11,29 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<Auth />}>
-            <Route path="login" element={<SignInForm />} />
-            <Route path="register" element={<SignUpForm />} />
+    <BrowserRouter>
+      <Routes>
+        {/* Auth */}
+        <Route path="/auth" element={<Auth />}>
+          <Route path="login" element={<SignInForm />} />
+          <Route path="register" element={<SignUpForm />} />
+        </Route>
+
+        {/* App shell */}
+        <Route path="/" element={<Layout />}>
+          {/* Protected */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="post" element={<Post />} />
           </Route>
-          <Route path="/" element={<Layout />}>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/post" element={<Post />} />
-            </Route>
-            <Route index element={<Home />} />
-            <Route path=":username" element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+
+          {/* Public */}
+          <Route index element={<Home />} />
+          <Route path="u/:username" element={<Home />} />
+        </Route>
+      </Routes>
+
       <ToastContainer />
-    </>
+    </BrowserRouter>
   );
 }
 
