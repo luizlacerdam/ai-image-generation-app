@@ -24,6 +24,10 @@ import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email."),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters.")
+    .max(30, "Username must be at most 30 characters."),
   password: z
     .string()
     .min(6, "Password must be at least 6 characters.")
@@ -39,6 +43,7 @@ export default function SignUpForm() {
     defaultValues: {
       email: "",
       password: "",
+      username: "",
     },
     mode: "onSubmit",
   });
@@ -65,6 +70,28 @@ export default function SignUpForm() {
       <CardContent>
         <form id="form-signup" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
+            <Controller
+              name="username"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-signup-username">
+                    Username
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-signup-username"
+                    type="text"
+                    placeholder="Username"
+                    autoComplete="username"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             <Controller
               name="email"
               control={form.control}

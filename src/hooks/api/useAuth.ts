@@ -7,30 +7,29 @@ export type AuthPayload = {
   password: string;
 };
 
+export type RegisterPayload = AuthPayload & {
+  username: string;
+};
+
 type AuthResponse = {
   token: string;
   user?: unknown;
 };
 
 export default function useAuth() {
-  // -----------------------------
-  // API calls (inside the hook)
-  // -----------------------------
   const loginRequest = async (payload: AuthPayload): Promise<AuthResponse> => {
     const { data } = await api.post<AuthResponse>("/auth/login", payload);
     return data;
   };
 
   const registerRequest = async (
-    payload: AuthPayload,
+    payload: RegisterPayload,
   ): Promise<AuthResponse> => {
     const { data } = await api.post<AuthResponse>("/auth/register", payload);
     return data;
   };
 
-  // -----------------------------
   // Mutations
-  // -----------------------------
   const login = useMutation({
     mutationKey: ["auth", "login"],
     mutationFn: loginRequest,

@@ -7,7 +7,6 @@ import useSavePost from "@/hooks/api/usePost";
 import { Loader, Sparkle, WandSparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-const { VITE_AI_API_URL } = import.meta.env;
 
 const blobToBase64 = (blob: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -18,7 +17,7 @@ const blobToBase64 = (blob: Blob): Promise<string> =>
   });
 
 const Post = () => {
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
   const { generateNewImage } = useImageGen();
   const { savePost } = useSavePost();
@@ -36,10 +35,10 @@ const Post = () => {
   };
 
   const postImageDisabled =
-    !imageUrl || generateNewImage.isPending || !name || savePost.isPending;
+    !imageUrl || generateNewImage.isPending || savePost.isPending;
 
   const handleSavePost = async () => {
-    if (!imageBlob || !name || !prompt) {
+    if (!imageBlob || !prompt) {
       toast.error("All fields are required!");
       return;
     }
@@ -48,7 +47,6 @@ const Post = () => {
 
     savePost.mutate(
       {
-        name,
         prompt,
         photo: base64Image,
       },
@@ -71,16 +69,6 @@ const Post = () => {
           </span>
         </div>
         <div className="flex flex-col gap-6">
-          <div>
-            <Label className="opacity-50 text-sm">AUTHOR</Label>
-            <Input
-              className="bg-homeBackground h-12"
-              type="text"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
           <div>
             <Label className="opacity-50 text-sm">IMAGE PROMPT</Label>
             <Textarea
