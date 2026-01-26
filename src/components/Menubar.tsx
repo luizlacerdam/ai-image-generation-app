@@ -13,7 +13,7 @@ import {
   Moon,
   Menu,
 } from "lucide-react";
-import { clearToken, isAuthenticated } from "@/utils/auth";
+import { isAuthenticated, clearTokenCookie } from "@/utils/authCookies";
 import useTheme from "@/hooks/useTheme";
 
 // shadcn/ui dropdown
@@ -36,7 +36,7 @@ const MenuBar = () => {
   };
 
   const handleLogout = () => {
-    clearToken();
+    clearTokenCookie();
     navigate("/", { replace: true });
   };
 

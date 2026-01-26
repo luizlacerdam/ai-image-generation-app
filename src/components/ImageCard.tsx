@@ -1,7 +1,8 @@
 import { PostResponse } from "@/hooks/api/usePost";
 import { Avatar } from "@radix-ui/react-avatar";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuthToken } from "@/hooks/useAuthToken";
 
 interface ImageCardProps {
   item: PostResponse;
@@ -9,6 +10,10 @@ interface ImageCardProps {
 }
 
 const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
+  const t = useAuthToken();
+
+  console.log(t);
+
   return (
     <div
       className="relative flex bg-gray-800 rounded-2xl shadow-lg gap-2 cursor-pointer transition-transform duration-300 hover:shadow-xl hover:scale-105"

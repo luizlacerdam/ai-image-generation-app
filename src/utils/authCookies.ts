@@ -14,6 +14,10 @@ export function getTokenCookie(): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+export const isAuthenticated = (): boolean => {
+  return !!getTokenCookie();
+};
+
 export function clearTokenCookie() {
   document.cookie = `${COOKIE_NAME}=; Max-Age=0; Path=/; SameSite=Lax`;
 }
