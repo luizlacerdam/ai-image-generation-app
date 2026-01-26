@@ -14,6 +14,14 @@ const Auth = () => {
     <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
       <div className="flex flex-1">
         <div className="relative grid flex-1 lg:grid-cols-2">
+          {/* Mobile-only home link */}
+          <Link
+            to="/"
+            className="lg:hidden absolute left-4 top-4 font-bold text-lg text-foreground hover:text-primary transition"
+          >
+            luiz&apos;s AIGenerator
+          </Link>
+
           {/* Top-right actions */}
           <div className="absolute right-4 top-4 flex items-center gap-2 md:right-8 md:top-8">
             <Button
