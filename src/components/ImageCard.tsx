@@ -1,6 +1,7 @@
 import { PostResponse } from "@/hooks/api/usePost";
 import { Avatar } from "@radix-ui/react-avatar";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Link, useNavigate } from "react-router-dom";
 
 interface ImageCardProps {
   item: PostResponse;
@@ -25,7 +26,12 @@ const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 text-white">
             <Avatar />
-            <span className="font-semibold text-sm">{item.user.username}</span>
+            <Link
+              to={`/u/${item.user.username}`}
+              className="font-semibold text-sm"
+            >
+              {item.user.username}
+            </Link>
           </div>
         </div>
       </div>
