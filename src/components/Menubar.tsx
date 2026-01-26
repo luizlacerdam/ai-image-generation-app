@@ -16,18 +16,20 @@ import {
 import { isAuthenticated, clearTokenCookie } from "@/utils/authCookies";
 import useTheme from "@/hooks/useTheme";
 
-// shadcn/ui dropdown
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuthToken } from "@/hooks/useAuthToken";
 
 const MenuBar = () => {
   const navigate = useNavigate();
   const url = useLocation();
   const authed = isAuthenticated();
+  const { username } = useAuthToken();
+
   const { theme, toggleTheme } = useTheme();
 
   const handleMainAction = () => {
@@ -51,6 +53,8 @@ const MenuBar = () => {
     : url.pathname === "/post"
       ? AppWindow
       : Plus;
+
+  const isOnMyPostsPage = username ? url.pathname === `/u/${username}` : false;
 
   return (
     <nav className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-secondary/20">
@@ -120,6 +124,17 @@ const MenuBar = () => {
               {mainActionLabel}
             </Button>
 
+            {authed && username && !isOnMyPostsPage && (
+              <Button
+                onClick={() => navigate(`/u/${username}`)}
+                type="button"
+                variant="outline"
+              >
+                <AppWindow className="mr-2" />
+                My Posts
+              </Button>
+            )}
+
             {!authed ? (
               <Button
                 variant="outline"
@@ -168,6 +183,17 @@ const MenuBar = () => {
                   <MainActionIcon className="h-4 w-4" />
                   {mainActionLabel}
                 </DropdownMenuItem>
+
+                {/* My posts */}
+                {authed && username && !isOnMyPostsPage && (
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/u/${username}`)}
+                    className="gap-2"
+                  >
+                    <AppWindow className="h-4 w-4" />
+                    My Posts
+                  </DropdownMenuItem>
+                )}
 
                 {/* Auth action */}
                 {!authed ? (
