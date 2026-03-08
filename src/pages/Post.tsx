@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useImageGen from "@/hooks/api/useImageGen";
-import useSavePost from "@/hooks/api/usePost";
+import usePost from "@/hooks/api/usePost";
 import { Loader, Sparkle, WandSparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const blobToBase64 = (blob: Blob): Promise<string> =>
@@ -15,44 +15,136 @@ const blobToBase64 = (blob: Blob): Promise<string> =>
     reader.readAsDataURL(blob);
   });
 
+export async function compressImage(
+  blob: Blob,
+  {
+    maxWidth = 1024,
+    maxHeight = 1024,
+    quality = 0.75, // 0..1
+    type = "image/webp", // "image/webp" | "image/jpeg"
+  }: {
+    maxWidth?: number;
+    maxHeight?: number;
+    quality?: number;
+    type?: string;
+  } = {},
+): Promise<Blob> {
+  const img = new Image();
+  const url = URL.createObjectURL(blob);
+
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () =>
+      reject(new Error("Failed to load image for compression"));
+    img.src = url;
+  });
+
+  let width = img.width;
+  let height = img.height;
+
+  if (width > maxWidth || height > maxHeight) {
+    const ratio = Math.min(maxWidth / width, maxHeight / height);
+    width = Math.max(1, Math.round(width * ratio));
+    height = Math.max(1, Math.round(height * ratio));
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    URL.revokeObjectURL(url);
+    throw new Error("Canvas not supported");
+  }
+
+  ctx.drawImage(img, 0, 0, width, height);
+  URL.revokeObjectURL(url);
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (b) => {
+        if (!b)
+          return reject(
+            new Error("Image compression failed (toBlob returned null)"),
+          );
+        resolve(b);
+      },
+      type,
+      quality,
+    );
+  });
+}
+
 const Post = () => {
   const [prompt, setPrompt] = useState("");
   const { generateNewImage } = useImageGen();
-  const { savePost } = useSavePost();
+  const { savePost } = usePost();
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
 
-  const handleGenerateImage = async () => {
+  useEffect(() => {
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [imageUrl]);
+
+  const postImageDisabled =
+    !imageBlob || generateNewImage.isPending || savePost.isPending;
+
+  const handleGenerateImage = () => {
+    if (!prompt.trim()) return;
+
     generateNewImage.mutate(prompt, {
-      onSuccess: async (blob) => {
+      onSuccess: (blob) => {
         setImageBlob(blob);
-        setImageUrl(URL.createObjectURL(blob));
+
+        setImageUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
       },
+      onError: () => toast.error("Failed to generate image"),
     });
   };
 
-  const postImageDisabled =
-    !imageUrl || generateNewImage.isPending || savePost.isPending;
-
   const handleSavePost = async () => {
-    if (!imageBlob || !prompt) {
-      toast.error("All fields are required!");
-      return;
+    try {
+      if (!imageBlob || !prompt.trim()) {
+        toast.error("All fields are required!");
+        return;
+      }
+
+      const compressedBlob = await compressImage(imageBlob, {
+        maxWidth: 1024,
+        maxHeight: 1024,
+        quality: 0.75,
+        type: "image/webp",
+      });
+
+      const base64Image = await blobToBase64(compressedBlob);
+
+      savePost.mutate(
+        {
+          prompt: prompt.trim(),
+          photo: base64Image,
+        },
+        {
+          onSuccess: () => toast.success("Post saved successfully!"),
+          onError: (err: any) => {
+            const msg =
+              err?.response?.status === 413
+                ? "Image still too large. Try lower quality or smaller max size."
+                : "Failed to save post";
+            toast.error(msg);
+          },
+        },
+      );
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to compress/upload image");
     }
-
-    const base64Image = await blobToBase64(imageBlob);
-
-    savePost.mutate(
-      {
-        prompt,
-        photo: base64Image,
-      },
-      {
-        onSuccess: () => toast.success("Post saved successfully!"),
-        onError: () => toast.error("Failed to save post"),
-      },
-    );
   };
 
   return (
@@ -93,7 +185,7 @@ const Post = () => {
               className="w-1/2"
               type="button"
               onClick={handleGenerateImage}
-              disabled={!prompt || generateNewImage.isPending}
+              disabled={!prompt.trim() || generateNewImage.isPending}
             >
               <Sparkle className="mr-2 h-4 w-4" />
               {generateNewImage.isPending ? "Generating..." : "Generate Image"}

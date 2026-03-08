@@ -3,6 +3,14 @@ import { Avatar } from "@radix-ui/react-avatar";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Link } from "react-router-dom";
 import { useAuthToken } from "@/hooks/useAuthToken";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff, MoreVertical } from "lucide-react";
 
 interface ImageCardProps {
   item: PostResponse;
@@ -11,14 +19,45 @@ interface ImageCardProps {
 
 const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
   const t = useAuthToken();
-
-  console.log(t);
+  const isOwner = t?.username && t.username === item.user.username;
 
   return (
     <div
       className="relative flex bg-gray-800 rounded-2xl shadow-lg gap-2 cursor-pointer transition-transform duration-300 hover:shadow-xl hover:scale-105"
       style={style}
     >
+      {/* Owner actions button */}
+      {isOwner && (
+        <div className="absolute top-3 right-3 z-10">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="secondary"
+                // disabled={isSavingVisibility}
+                className="rounded-full"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem
+                // onClick={toggleShowPost}
+                // disabled={isSavingVisibility}
+                className="gap-2"
+              >
+                {item.showPost ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+                {item.showPost ? "Hide from Community" : "Show in Community"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
       <LazyLoadImage
         alt={item.prompt}
         width="100%"
@@ -38,6 +77,11 @@ const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
               {item.user.username}
             </Link>
           </div>
+          {!item.showPost && (
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-white">
+              Hidden
+            </span>
+          )}
         </div>
       </div>
     </div>

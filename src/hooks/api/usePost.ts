@@ -31,6 +31,16 @@ const savePost = async (data: PostCreate): Promise<PostResponse> => {
   return response.data;
 };
 
+const changePostVisibility = async ({
+  postId,
+  showPost,
+}: {
+  postId: string;
+  showPost: boolean;
+}): Promise<void> => {
+  await api.patch(`/visibility/${postId}`, { showPost });
+};
+
 export default function usePost(search?: string, enabled = true) {
   const queryClient = useQueryClient();
 
@@ -47,9 +57,17 @@ export default function usePost(search?: string, enabled = true) {
     },
   });
 
+  const changeVisibilityMutation = useMutation({
+    mutationFn: changePostVisibility,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
   return {
     ...postsQuery,
     posts: postsQuery.data,
     savePost: savePostMutation,
+    changeVisibility: changeVisibilityMutation,
   };
 }
