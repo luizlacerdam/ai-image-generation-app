@@ -15,26 +15,36 @@ import { Eye, EyeOff, MoreVertical } from "lucide-react";
 interface ImageCardProps {
   item: PostResponse;
   style: React.CSSProperties;
+  onToggleVisibility?: (postId: string, showPost: boolean) => void;
+  isSavingVisibility?: boolean;
 }
 
-const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
+const ImageCard: React.FC<ImageCardProps> = ({
+  item,
+  style,
+  onToggleVisibility,
+  isSavingVisibility = false,
+}) => {
   const t = useAuthToken();
   const isOwner = t?.username && t.username === item.user.username;
+
+  const toggleShowPost = () => {
+    onToggleVisibility?.(item._id, !item.showPost);
+  };
 
   return (
     <div
       className="relative flex bg-gray-800 rounded-2xl shadow-lg gap-2 cursor-pointer transition-transform duration-300 hover:shadow-xl hover:scale-105"
       style={style}
     >
-      {/* Owner actions button */}
-      {isOwner && (
+      {isOwner && onToggleVisibility && (
         <div className="absolute top-3 right-3 z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 size="icon"
                 variant="secondary"
-                // disabled={isSavingVisibility}
+                disabled={isSavingVisibility}
                 className="rounded-full"
               >
                 <MoreVertical className="h-4 w-4" />
@@ -43,8 +53,8 @@ const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
 
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem
-                // onClick={toggleShowPost}
-                // disabled={isSavingVisibility}
+                onClick={toggleShowPost}
+                disabled={isSavingVisibility}
                 className="gap-2"
               >
                 {item.showPost ? (
@@ -58,12 +68,14 @@ const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
           </DropdownMenu>
         </div>
       )}
+
       <LazyLoadImage
         alt={item.prompt}
         width="100%"
         src={item.photo}
         style={{ borderRadius: "12px" }}
       />
+
       <div className="absolute inset-0 flex flex-col justify-end gap-2 p-4 backdrop-blur-sm bg-black/50 rounded-xl opacity-0 transition-opacity duration-300 hover:opacity-100">
         <p className="font-normal text-sm text-white">• {item.prompt}</p>
 
@@ -77,6 +89,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ item, style }) => {
               {item.user.username}
             </Link>
           </div>
+
           {!item.showPost && (
             <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-white">
               Hidden

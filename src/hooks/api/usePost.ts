@@ -38,7 +38,7 @@ const changePostVisibility = async ({
   postId: string;
   showPost: boolean;
 }): Promise<void> => {
-  await api.patch(`/visibility/${postId}`, { showPost });
+  await api.patch(`/posts/visibility/${postId}`, { showPost });
 };
 
 export default function usePost(search?: string, enabled = true) {
@@ -68,6 +68,7 @@ export default function usePost(search?: string, enabled = true) {
     ...postsQuery,
     posts: postsQuery.data,
     savePost: savePostMutation,
-    changeVisibility: changeVisibilityMutation,
+    changeVisibility: changeVisibilityMutation.mutate,
+    isSavingVisibility: changeVisibilityMutation.isPending,
   };
 }

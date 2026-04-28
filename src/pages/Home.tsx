@@ -135,6 +135,10 @@ const Home = () => {
                 key={item._id}
                 item={item}
                 style={calculateGridPosition(index)}
+                onToggleVisibility={(postId, showPost) =>
+                  community.changeVisibility({ postId, showPost })
+                }
+                isSavingVisibility={community.isSavingVisibility}
               />
             ))}
           </div>
