@@ -1,135 +1,233 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useImageGen from "@/hooks/api/useImageGen";
-import useSavePost from "@/hooks/api/usePost";
+import usePost from "@/hooks/api/usePost";
 import { Loader, Sparkle, WandSparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-const { VITE_AI_API_URL } = import.meta.env;
 
+const blobToBase64 = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
+export async function compressImage(
+  blob: Blob,
+  {
+    maxWidth = 1024,
+    maxHeight = 1024,
+    quality = 0.75, // 0..1
+    type = "image/webp", // "image/webp" | "image/jpeg"
+  }: {
+    maxWidth?: number;
+    maxHeight?: number;
+    quality?: number;
+    type?: string;
+  } = {},
+): Promise<Blob> {
+  const img = new Image();
+  const url = URL.createObjectURL(blob);
+
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () =>
+      reject(new Error("Failed to load image for compression"));
+    img.src = url;
+  });
+
+  let width = img.width;
+  let height = img.height;
+
+  if (width > maxWidth || height > maxHeight) {
+    const ratio = Math.min(maxWidth / width, maxHeight / height);
+    width = Math.max(1, Math.round(width * ratio));
+    height = Math.max(1, Math.round(height * ratio));
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    URL.revokeObjectURL(url);
+    throw new Error("Canvas not supported");
+  }
+
+  ctx.drawImage(img, 0, 0, width, height);
+  URL.revokeObjectURL(url);
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (b) => {
+        if (!b)
+          return reject(
+            new Error("Image compression failed (toBlob returned null)"),
+          );
+        resolve(b);
+      },
+      type,
+      quality,
+    );
+  });
+}
 
 const Post = () => {
-	const [name, setName] = useState("");
-	const [prompt, setPrompt] = useState("");
-	const { generateNewImage, } = useImageGen();
-	const { savePost } = useSavePost();
+  const [prompt, setPrompt] = useState("");
+  const { generateNewImage } = useImageGen();
+  const { savePost } = usePost();
 
-	const [imageUrl, setImageUrl] = useState('');
-	const handleGenerateImage = async () => {
-		generateNewImage.mutate(prompt, {
-			onSuccess: (data) => {
-				setImageUrl(data); // Update the image URL state with the generated image URL				
-			},
-			onError: (error) => {
-				console.error("Error generating image:", error);
-			},
-		});
-	};
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
 
-	const postImageDisabled = !imageUrl || generateNewImage.isPending || !name || savePost.isPending;
+  useEffect(() => {
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [imageUrl]);
 
-const handleSavePost = () => {
-	if (!imageUrl || !name || !prompt) {
-		alert("All fields are required!");
-		return;
-	}
+  const postImageDisabled =
+    !imageBlob || generateNewImage.isPending || savePost.isPending;
 
-	savePost.mutate(
-		{
-			name,
-			prompt,
-			photo: `${VITE_AI_API_URL}/prompt/${prompt}`, // Use image URL created from blob
-		},
-		{
-			onSuccess: () => {
-				toast.success("Post saved successfully!");
-			},
-			onError: (error) => {
-				toast.error("Failed to save post. Please try again.");
-				console.error("Failed to save post:", error);
-			},
-		}
-	);
-};
+  const handleGenerateImage = () => {
+    if (!prompt.trim()) return;
 
-	return (
-		<div className="flex flex-col-reverse sm:flex-row sm:mt-20 p-12 sm:gap-20 gap-10 px-6 max-w-7xl mx-auto">
-			<div className="flex flex-col gap-6 p-4 text-white sm:w-1/2 w-full">
-				<div className="flex flex-col gap-2">
-					<span className="text-2xl font-semibold">
-						Generate Image with prompt
-					</span>
-					<span className="text-normal opacity-50">
-						Write your prompt according to the image you want to generate!
-					</span>
-				</div>
-				<div className="flex flex-col gap-6">
-					<div>
-						<Label className="opacity-50 text-sm">AUTHOR</Label>
-						<Input
-							className="bg-homeBackground h-12"
-							type="text"
-							placeholder="Enter your name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-						/>
-					</div>
-					<div>
-						<Label className="opacity-50 text-sm">IMAGE PROMPT</Label>
-						<Textarea
-							className="bg-homeBackground h-40"
-							placeholder="Write your prompt here"
-							value={prompt}
-							onChange={(e) => setPrompt(e.target.value)}
-						/>
-					</div>
-					<span className="text-sm opacity-50">
-						* You can post the AI Generated image to showcase in the community!
-					</span>
-				</div>
-				<div className="flex flex-row justify-center gap-4 w-full">
-					<Button
-						className="bg-blue-500 hover:bg-blue-800 w-1/2"
-						type="button"
-						onClick={handleGenerateImage}
-						disabled={!prompt || generateNewImage.isPending}
-					>
-						<Sparkle />
-						Generate Image
-					</Button>
-					<Button
-						className="bg-violet-500 hover:bg-violet-800 w-1/2"
-						type="button"
-						disabled={postImageDisabled}
-						onClick={handleSavePost}
-					>
-						<WandSparkles />
-						Post Image
-					</Button>
-				</div>
-			</div>
-				<div className="sm:w-1/2 w-full aspect-square bg-[#1e1f2a] border-dashed border-2 border-violet-500 flex justify-center items-center border-opacity-50 rounded-xl">
-				{generateNewImage.isPending ? (
-					<span className="text-white text-opacity-50 animate-pulse flex items-center flex-col">
-						<Loader className="animate-spin mr-2" />
-						Generating image...
-					</span>
-				) : imageUrl ? (
-					<img
-						src={imageUrl}
-						alt="Generated"
-						className="rounded-xl max-w-full max-h-full"
-					/>
-				) : (
-					<span className="text-white text-opacity-50">
-						Write a prompt to generate image
-					</span>
-				)}
-			</div>
-		</div>
-	);
+    generateNewImage.mutate(prompt, {
+      onSuccess: (blob) => {
+        setImageBlob(blob);
+
+        setImageUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
+      },
+      onError: () => toast.error("Failed to generate image"),
+    });
+  };
+
+  const handleSavePost = async () => {
+    try {
+      if (!imageBlob || !prompt.trim()) {
+        toast.error("All fields are required!");
+        return;
+      }
+
+      const compressedBlob = await compressImage(imageBlob, {
+        maxWidth: 1024,
+        maxHeight: 1024,
+        quality: 0.75,
+        type: "image/webp",
+      });
+
+      const base64Image = await blobToBase64(compressedBlob);
+
+      savePost.mutate(
+        {
+          prompt: prompt.trim(),
+          photo: base64Image,
+        },
+        {
+          onSuccess: () => toast.success("Post saved successfully!"),
+          onError: (err: any) => {
+            const msg =
+              err?.response?.status === 413
+                ? "Image still too large. Try lower quality or smaller max size."
+                : "Failed to save post";
+            toast.error(msg);
+          },
+        },
+      );
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to compress/upload image");
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16">
+      <div className="flex flex-col-reverse gap-10 sm:flex-row sm:gap-20">
+        {/* Left panel */}
+        <div className="flex w-full flex-col gap-6 sm:w-1/2">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-semibold text-foreground">
+              Generate Image with prompt
+            </h1>
+            <p className="text-muted-foreground">
+              Write your prompt according to the image you want to generate!
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div>
+              <Label className="text-sm text-muted-foreground">
+                IMAGE PROMPT
+              </Label>
+              <Textarea
+                className="mt-2 h-40 bg-card text-foreground placeholder:text-muted-foreground border-border"
+                placeholder="Write your prompt here"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              * You can post the AI Generated image to showcase in the
+              community!
+            </p>
+          </div>
+
+          <div className="flex w-full gap-4">
+            <Button
+              className="w-1/2"
+              type="button"
+              onClick={handleGenerateImage}
+              disabled={!prompt.trim() || generateNewImage.isPending}
+            >
+              <Sparkle className="mr-2 h-4 w-4" />
+              {generateNewImage.isPending ? "Generating..." : "Generate Image"}
+            </Button>
+
+            <Button
+              className="w-1/2"
+              variant="secondary"
+              type="button"
+              disabled={postImageDisabled}
+              onClick={handleSavePost}
+            >
+              <WandSparkles className="mr-2 h-4 w-4" />
+              {savePost.isPending ? "Posting..." : "Post Image"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Right panel (preview) */}
+        <div className="w-full sm:w-1/2">
+          <div className="aspect-square rounded-xl border border-dashed border-border bg-card/50 flex items-center justify-center overflow-hidden">
+            {generateNewImage.isPending ? (
+              <div className="flex flex-col items-center gap-2 text-muted-foreground animate-pulse">
+                <Loader className="h-5 w-5 animate-spin" />
+                <span>Generating image...</span>
+              </div>
+            ) : imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Generated"
+                className="max-h-full max-w-full object-contain"
+              />
+            ) : (
+              <span className="text-muted-foreground">
+                Write a prompt to generate an image
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Post;

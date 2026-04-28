@@ -1,74 +1,253 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { AppWindow, Plus, Github, Linkedin, Globe } from "lucide-react";
+import {
+  AppWindow,
+  Plus,
+  Github,
+  Linkedin,
+  Globe,
+  LogIn,
+  UserPlus,
+  LogOut,
+  Sun,
+  Moon,
+  Menu,
+} from "lucide-react";
+import { isAuthenticated, clearTokenCookie } from "@/utils/authCookies";
+import useTheme from "@/hooks/useTheme";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuthToken } from "@/hooks/useAuthToken";
 
 const MenuBar = () => {
-	const navigate = useNavigate();
-	const url = useLocation();
+  const navigate = useNavigate();
+  const url = useLocation();
+  const authed = isAuthenticated();
+  const { username } = useAuthToken();
 
-	const handleNavigate = () => {
-		navigate(url.pathname === "/post" ? "/" : "/post");
-	};
+  const { theme, toggleTheme } = useTheme();
 
-	return (
-		<nav className="flex items-baseline justify-between bg-[#1e1f2a] text-white p-4 shadow-md sticky top-0 z-10">
-			{/* Left side - logo + links */}
-			<div className="flex items-center gap-4 w-full md:w-auto mb-4 md:mb-0">
-				<Link
-				to="/"
-				className="font-bold text-lg sm:text-xl text-white hover:text-violet-400 transition"
-				>
-				luiz's GemAI
-				</Link>
+  const handleMainAction = () => {
+    if (!authed) return navigate("/auth/login");
+    navigate(url.pathname === "/post" ? "/" : "/post");
+  };
 
-				<div className="flex gap-3">
-					<a
-						href="https://github.com/luizlacerdam"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="hover:text-violet-400 transition"
-					>
-						<Github className="w-5 h-5" />
-					</a>
-					<a
-						href="https://www.linkedin.com/in/luizlacerdam/"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="hover:text-violet-400 transition"
-					>
-						<Linkedin className="w-5 h-5" />
-					</a>
-					<a
-						href="https://www.luizlacerdam.dev/"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="hover:text-violet-400 transition"
-					>
-						<Globe className="w-5 h-5" />
-					</a>
-				</div>
-			</div>
-			<div className="w-36 md:w-auto">
-				<Button
-				onClick={handleNavigate}
-				className={`w-full md:w-auto ${
-					url.pathname === "/post"
-					? "bg-violet-500 hover:bg-violet-800"
-					: "bg-blue-500 hover:bg-blue-800"
-				}`}
-				type="button"
-				>
-				{url.pathname === "/post" ? (
-					<AppWindow className="mr-2" />
-				) : (
-					<Plus className="mr-2" />
-				)}
-				{url.pathname === "/post" ? "Home" : "New post"}
-				</Button>
-			</div>
-		</nav>
+  const handleLogout = () => {
+    clearTokenCookie();
+    navigate("/", { replace: true });
+  };
 
-	);
+  const mainActionLabel = !authed
+    ? "Login"
+    : url.pathname === "/post"
+      ? "Home"
+      : "New post";
+
+  const MainActionIcon = !authed
+    ? LogIn
+    : url.pathname === "/post"
+      ? AppWindow
+      : Plus;
+
+  const isOnMyPostsPage = username ? url.pathname === `/u/${username}` : false;
+
+  return (
+    <nav className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-secondary/20">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 p-4">
+        {/* Left: Logo + socials (socials only on md+) */}
+        <div className="flex items-center gap-4">
+          <Link
+            to="/"
+            className="font-bold text-lg sm:text-xl text-foreground hover:text-primary transition"
+          >
+            luiz&apos;s AIGenerator
+          </Link>
+
+          <div className="hidden items-center gap-3 text-muted-foreground md:flex">
+            <a
+              href="https://github.com/luizlacerdam"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="GitHub"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/luizlacerdam/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.luizlacerdam.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition"
+              aria-label="Website"
+            >
+              <Globe className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
+
+        {/* Right: Desktop actions + Mobile hamburger */}
+        <div className="flex items-center gap-2">
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="border-border"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              title="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+
+            <Button onClick={handleMainAction} type="button">
+              <MainActionIcon className="mr-2" />
+              {mainActionLabel}
+            </Button>
+
+            {authed && username && !isOnMyPostsPage && (
+              <Button
+                onClick={() => navigate(`/u/${username}`)}
+                type="button"
+                variant="outline"
+              >
+                <AppWindow className="mr-2" />
+                My Posts
+              </Button>
+            )}
+
+            {!authed ? (
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => navigate("/auth/register")}
+              >
+                <UserPlus className="mr-2" />
+                Sign up
+              </Button>
+            ) : (
+              <Button variant="outline" type="button" onClick={handleLogout}>
+                <LogOut className="mr-2" />
+                Logout
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile hamburger menu */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="border-border"
+                  aria-label="Open menu"
+                  title="Open menu"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-56">
+                {/* Theme toggle */}
+                <DropdownMenuItem onClick={toggleTheme} className="gap-2">
+                  {theme === "dark" ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                  {theme === "dark" ? "Light mode" : "Dark mode"}
+                </DropdownMenuItem>
+
+                {/* Main action */}
+                <DropdownMenuItem onClick={handleMainAction} className="gap-2">
+                  <MainActionIcon className="h-4 w-4" />
+                  {mainActionLabel}
+                </DropdownMenuItem>
+
+                {/* My posts */}
+                {authed && username && !isOnMyPostsPage && (
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/u/${username}`)}
+                    className="gap-2"
+                  >
+                    <AppWindow className="h-4 w-4" />
+                    My Posts
+                  </DropdownMenuItem>
+                )}
+
+                {/* Auth action */}
+                {!authed ? (
+                  <DropdownMenuItem
+                    onClick={() => navigate("/auth/register")}
+                    className="gap-2"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Sign up
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={handleLogout} className="gap-2">
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                )}
+
+                {/* Socials inside hamburger (mobile only) */}
+                <div className="mt-2 border-t pt-2 flex items-center justify-around text-muted-foreground">
+                  <a
+                    href="https://github.com/luizlacerdam"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition"
+                    aria-label="GitHub"
+                  >
+                    <Github className="h-5 w-5" />
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/luizlacerdam/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                  <a
+                    href="https://www.luizlacerdam.dev/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition"
+                    aria-label="Website"
+                  >
+                    <Globe className="h-5 w-5" />
+                  </a>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 };
 
 export default MenuBar;

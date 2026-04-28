@@ -1,43 +1,74 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../api/api";
 
-export interface Post {
-	name: string;
-	prompt: string;
-	photo: string;
+export interface User {
+  _id: string;
+  username: string;
 }
 
-const getPosts = async (search?: string): Promise<Post[]> => {
-	const response = await api.get("/posts/all", {
-		params: { search },
-	});
-	return response.data;
+export interface PostCreate {
+  prompt: string;
+  photo: string;
+}
+
+export type PostResponse = PostCreate & {
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  showPost: boolean;
+  user: User;
 };
 
-const savePost = async (data: Post): Promise<Post> => {
-	const response = await api.post("/posts/new", data);
-	return response.data;
+const getPosts = async (search?: string): Promise<PostResponse[]> => {
+  const response = await api.get("/posts/all", {
+    params: { search },
+  });
+  return response.data;
 };
 
-export default function usePost(search?: string) {
-	const queryClient = useQueryClient();
+const savePost = async (data: PostCreate): Promise<PostResponse> => {
+  const response = await api.post("/posts/new", data);
+  return response.data;
+};
 
-	const postsQuery = useQuery<Post[]>({
-		queryKey: ["posts", search ?? ""],
-		queryFn: () => getPosts(search),
-		enabled: search !== undefined,
-	});
+const changePostVisibility = async ({
+  postId,
+  showPost,
+}: {
+  postId: string;
+  showPost: boolean;
+}): Promise<void> => {
+  await api.patch(`/posts/visibility/${postId}`, { showPost });
+};
 
-	const savePostMutation = useMutation({
-		mutationFn: savePost,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-		},
-	});
+export default function usePost(search?: string, enabled = true) {
+  const queryClient = useQueryClient();
 
-	return {
-		...postsQuery,
-		posts: postsQuery.data,
-		savePost: savePostMutation,
-	};
+  const postsQuery = useQuery<PostResponse[]>({
+    queryKey: ["posts", search ?? ""],
+    queryFn: () => getPosts(search),
+    enabled,
+  });
+
+  const savePostMutation = useMutation({
+    mutationFn: savePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
+  const changeVisibilityMutation = useMutation({
+    mutationFn: changePostVisibility,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
+  return {
+    ...postsQuery,
+    posts: postsQuery.data,
+    savePost: savePostMutation,
+    changeVisibility: changeVisibilityMutation.mutate,
+    isSavingVisibility: changeVisibilityMutation.isPending,
+  };
 }
